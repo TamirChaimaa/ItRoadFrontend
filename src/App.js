@@ -1,24 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import { Provider } from 'react-redux';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { store } from './store/store';
+import SigninForm from './components/signin_form_component';
+import SignupForm from './components/signup_form_components';
+import AuthGuard from './components/AuthGuard';
+import AdminDashboard from './components/AdminDashboard';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <Router>
+        <Routes>
+          <Route path="/signin" element={<SigninForm />} />
+          <Route path="/signup" element={<SignupForm />} />
+          <Route path="/*" element={
+            <AuthGuard>
+              <AdminDashboard />
+            </AuthGuard>
+          } />
+        </Routes>
+      </Router>
+    </Provider>
   );
 }
 
