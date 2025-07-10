@@ -64,7 +64,7 @@ const Dashboard = () => {
           <p className="text-gray-600">Overview of your management system</p>
         </div>
 
-        {/* Stats Grid */}
+        {/* Stats Grids */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
             <StatCard key={index} {...stat} />
