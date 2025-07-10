@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api/auth';
+const API_BASE_URL = 'https://itroadsigninservice-production.up.railway.app/api/auth';
 
 //Thunk for login
 // Note: rememberMe is not used here, as per your request
@@ -80,7 +80,7 @@ export const validateToken = createAsyncThunk(
 export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
   async (_, { dispatch }) => {
-    // Nettoyer le stockage
+    // Clear both localStorage and sessionStorage
     localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
     localStorage.removeItem('username');
@@ -122,7 +122,6 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log("✅ Token reçu :", action.payload.token); // 🔍 Ajoute ceci
         state.loading = false;
         state.isAuthenticated = true;
         state.token = action.payload.token;
