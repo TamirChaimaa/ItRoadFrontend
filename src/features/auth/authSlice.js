@@ -1,33 +1,33 @@
 // store/slices/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const API_BASE_URL = 'https://itroadsigninservice-production.up.railway.app/api/auth';
 
-//Thunk for login
-// Note: rememberMe is not used here, as per your request
+// Thunk for login
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
-  async ({ username, password }, { rejectWithValue }) => { 
+  async ({ username, password }, { rejectWithValue }) => {
     try {
-      // Vérification des champs requis
       const response = await axios.post(`${API_BASE_URL}/login`, {
         username,
         password,
       });
 
-      const { token, role, username: userName } = response.data;
+      const { token, role, username: userName, id } = response.data;
 
-      // Stockage fixe dans localStorage
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('userRole', role);
-      localStorage.setItem('username', userName);
+      // Store authentication data in cookies (expires in 1 day)
+      Cookies.set('authToken', token, { expires: 1 });
+      Cookies.set('userRole', role, { expires: 1 });
+      Cookies.set('username', userName, { expires: 1 });
+      Cookies.set('userId', id, { expires: 1 });
 
       return {
         token,
         role,
         username: userName,
-        userId: response.data.userId,
+        userId: id,
       };
     } catch (error) {
       const message = error.response?.data?.message || 'Login failed';
@@ -36,63 +36,58 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-
-// Thunk pour valider le token
+// Thunk for token validation
 export const validateToken = createAsyncThunk(
   'auth/validateToken',
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-      
+      const token = Cookies.get('authToken');
+
       if (!token) {
         return rejectWithValue('No token found');
       }
 
       const response = await axios.post(`${API_BASE_URL}/validate`, {}, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       return {
         token,
-        userId: response.data.userId,
-        username: response.data.username,
-        role: response.data.role,
-        valid: response.data.valid
+        userId: response.data.userId || Cookies.get('userId'),
+        username: response.data.username || Cookies.get('username'),
+        role: response.data.role || Cookies.get('userRole'),
+        valid: response.data.valid,
       };
     } catch (error) {
-      // Nettoyer le stockage en cas d'erreur
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('username');
-      sessionStorage.removeItem('authToken');
-      sessionStorage.removeItem('userRole');
-      sessionStorage.removeItem('username');
-      
+      //Clear cookies if token is invalid or request fails
+      Cookies.remove('authToken');
+      Cookies.remove('userRole');
+      Cookies.remove('username');
+      Cookies.remove('userId');
+
       const message = error.response?.data?.message || 'Token validation failed';
       return rejectWithValue(message);
     }
   }
 );
 
-// Thunk pour la déconnexion
+// Thunk for logout
 export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
-  async (_, { dispatch }) => {
-    // Clear both localStorage and sessionStorage
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('username');
-    sessionStorage.removeItem('authToken');
-    sessionStorage.removeItem('userRole');
-    sessionStorage.removeItem('username');
+  async () => {
+    // ✅ Remove all authentication-related cookies
+    Cookies.remove('authToken');
+    Cookies.remove('userRole');
+    Cookies.remove('username');
+    Cookies.remove('userId');
 
     return true;
   }
 );
 
-// État initial
+// Initial state
 const initialState = {
   user: null,
   token: null,
@@ -102,21 +97,23 @@ const initialState = {
   isInitialized: false,
 };
 
-// Slice
+// Auth slice
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    // Clear error messages
     clearError: (state) => {
       state.error = null;
     },
+    // Mark app as initialized (used for token validation on app load)
     setInitialized: (state) => {
       state.isInitialized = true;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Login cases
+      // Login
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -139,8 +136,8 @@ const authSlice = createSlice({
         state.token = null;
         state.error = action.payload;
       })
-      
-      // Validate token cases
+
+      // Token validation
       .addCase(validateToken.pending, (state) => {
         state.loading = true;
       })
@@ -164,8 +161,8 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.isInitialized = true;
       })
-      
-      // Logout cases
+
+      // Logout
       .addCase(logoutUser.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
