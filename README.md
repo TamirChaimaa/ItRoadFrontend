@@ -72,3 +72,5 @@ npm install web-vitals
 lucid
 npm install axios
 npm install framer-motion
+npm install redux
+npm install js-cookie 
