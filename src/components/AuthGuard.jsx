@@ -10,20 +10,21 @@ const AuthGuard = ({ children }) => {
   const { isAuthenticated, loading, isInitialized } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    // Vérifier le token au chargement
+    //Verify token on initial load
+    // This will check if the user is authenticated when the component mounts
     if (!isInitialized) {
       dispatch(validateToken());
     }
   }, [dispatch, isInitialized]);
 
   useEffect(() => {
-    // Rediriger vers login si non authentifié
+    // Redirect to login if not authenticated
     if (isInitialized && !isAuthenticated) {
       navigate('/signin');
     }
   }, [isAuthenticated, isInitialized, navigate]);
 
-  // Afficher un loader pendant la vérification
+  // Show a loading spinner while checking authentication status
   if (loading || !isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -35,7 +36,8 @@ const AuthGuard = ({ children }) => {
     );
   }
 
-  // Afficher le contenu protégé si authentifié
+  // If authenticated, render the children components
+  // Otherwise, return null (or you could redirect to a different route)
   return isAuthenticated ? children : null;
 };
 
