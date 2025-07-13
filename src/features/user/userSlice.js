@@ -20,6 +20,7 @@ export const fetchCurrentUserProfile = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log('API Response:', response.data);
 
       return response.data;
     } catch (error) {
