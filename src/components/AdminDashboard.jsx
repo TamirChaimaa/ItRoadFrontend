@@ -6,7 +6,6 @@ import Footer from "./layout/Footer";
 import Dashboard from "./dashboard/Dashboard";
 import Documents from "./documents/Documents";
 import AddDocument from "./documents/AddDocument";
-import UsersTabs from "./users/UsersTabs";
 import Profile from "./profile/Profile";
 import Loader from "./Loader";
 
@@ -35,7 +34,6 @@ const AdminDashboardLayout = () => {
             <Route path="" element={<Dashboard />} />
             <Route path="documents" element={<Documents />} />
             <Route path="add-document" element={<AddDocument />} />
-            <Route path="users" element={<UsersTabs />} />
             <Route path="profile" element={<Profile />} />
           </Routes>
         </main>
