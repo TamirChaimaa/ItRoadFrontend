@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../../features/auth/authSlice";
 import { useState } from "react";
-import { Home, FileText, Plus, Users, Settings, LogOut, Info, XCircle } from "lucide-react";
+import { Home, FileText, Plus, Settings, LogOut, Info, XCircle } from "lucide-react";
 
 const Sidebar = ({ isOpen }) => {
   const location = useLocation();
@@ -23,7 +23,6 @@ const Sidebar = ({ isOpen }) => {
     { path: "/dashboard", label: "Dashboard", icon: Home },
     { path: "/dashboard/documents", label: "Documents", icon: FileText },
     { path: "/dashboard/add-document", label: "Add Document", icon: Plus },
-    { path: "/dashboard/users", label: "Users", icon: Users },
     { path: "/dashboard/profile", label: "Profile", icon: Settings },
   ];
 
