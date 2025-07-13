@@ -289,10 +289,11 @@ const Documents = () => {
               whileFocus={{ scale: 1.02 }}
             >
               <option value="all">All categories</option>
-              <option value="Report">Reports</option>
-              <option value="Presentation">Presentations</option>
-              <option value="Contract">Contracts</option>
+              <option value="Report">Report</option>
+              <option value="Presentation">Presentation</option>
+              <option value="Contract">Contract</option>
               <option value="Data">Data</option>
+              <option value="Invoice">Other</option>
             </motion.select>
           </div>
         </motion.div>

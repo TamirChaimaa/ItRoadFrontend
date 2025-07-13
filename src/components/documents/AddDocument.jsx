@@ -171,9 +171,7 @@ const AddDocument = () => {
                     <option value="report">Report</option>
                     <option value="presentation">Presentation</option>
                     <option value="contract">Contract</option>
-                    <option value="invoice">Invoice</option>
-                    <option value="manual">Manual</option>
-                    <option value="policy">Policy</option>
+                    <option value="invoice">Data</option>
                     <option value="other">Other</option>
                   </select>
                 </div>

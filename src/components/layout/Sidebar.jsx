@@ -20,11 +20,11 @@ const Sidebar = ({ isOpen }) => {
 
   // Navigation menu
   const menuItems = [
-    { path: "/dashboard", label: "Dashboard", icon: Home },
-    { path: "/dashboard/documents", label: "Documents", icon: FileText },
-    { path: "/dashboard/add-document", label: "Add Document", icon: Plus },
-    { path: "/dashboard/users", label: "Users", icon: Users },
-    { path: "/dashboard/profile", label: "Profile", icon: Settings },
+    { path: "", label: "Dashboard", icon: Home },
+    { path: "/documents", label: "Documents", icon: FileText },
+    { path: "/add-document", label: "Add Document", icon: Plus },
+    { path: "/users", label: "Users", icon: Users },
+    { path: "/profile", label: "Profile", icon: Settings },
   ];
 
   return (
