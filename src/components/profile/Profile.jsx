@@ -347,36 +347,6 @@ const Profile = () => {
                   </div>
                 )}
               </div>
-
-              {/* Account Information */}
-              <div className="border-t pt-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">Account Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Status */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">Status</label>
-                    <div className="flex items-center space-x-3 p-4 bg-gray-100 rounded-2xl">
-                      <Shield className="w-5 h-5 text-gray-400" />
-                      <span className={`font-semibold ${
-                        currentUser?.status === 'Active' ? 'text-green-600' : 'text-yellow-600'
-                      }`}>
-                        {currentUser?.status || 'Pending'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Last Login */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">Last Login</label>
-                    <div className="flex items-center space-x-3 p-4 bg-gray-100 rounded-2xl">
-                      <User className="w-5 h-5 text-gray-400" />
-                      <span className="text-gray-500">
-                        {currentUser?.lastLogin ? new Date(currentUser.lastLogin).toLocaleDateString() : 'Never'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
