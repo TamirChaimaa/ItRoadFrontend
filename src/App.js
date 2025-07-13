@@ -12,9 +12,8 @@ function App() {
       <Router>
         <Routes>
           <Route path="/signin" element={<SigninForm />} />
-          <Route path="/" element={<SigninForm />} />
           <Route path="/signup" element={<SignupForm />} />
-          <Route path="/dashboard/*" element={
+          <Route path="/*" element={
             <AuthGuard>
               <AdminDashboard />
             </AuthGuard>
