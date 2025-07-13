@@ -275,20 +275,6 @@ const SignupForm = () => {
     navigate("/signin");
   };
 
-  const ITRoadLogo = () => (
-    <div className="flex items-center justify-center mb-8">
-      <div className="relative">
-        <div className="text-4xl font-bold text-gray-800">
-          <span className="text-cyan-400">IT</span>
-          <span className="text-gray-800">ROAD</span>
-        </div>
-        <div className="text-sm text-gray-600 text-center mt-1">GROUP</div>
-        <div className="absolute -top-2 -left-2 w-8 h-8 border-2 border-cyan-400 rounded-full opacity-30"></div>
-        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-cyan-400 rounded-full"></div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-gray-100 flex items-center justify-center p-4 font-sans">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-4xl transform transition-all hover:scale-[1.02] duration-300">
@@ -309,38 +295,44 @@ const SignupForm = () => {
           {/* Row 1: Username & Email */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <User className="h-6 w-6 text-gray-400" />
+              <label className="text-cyan-500 text-sm mb-2 block">Username</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <User className="h-6 w-6 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="Username"
+                  className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
+                    errors.username ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
               </div>
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Username"
-                className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
-                  errors.username ? "border-red-500" : "border-gray-300"
-                }`}
-              />
               {errors.username && (
                 <p className="text-red-500 text-sm mt-2">{errors.username}</p>
               )}
             </div>
 
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Mail className="h-6 w-6 text-gray-400" />
+              <label className="text-cyan-500 text-sm mb-2 block">Email</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail className="h-6 w-6 text-gray-400" />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Email"
+                  className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
+                    errors.email ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
               </div>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Email"
-                className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
-                  errors.email ? "border-red-500" : "border-gray-300"
-                }`}
-              />
               {errors.email && (
                 <p className="text-red-500 text-sm mt-2">{errors.email}</p>
               )}
@@ -350,66 +342,72 @@ const SignupForm = () => {
           {/* Row 2: Password & Confirm Password */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Lock className="h-6 w-6 text-gray-400" />
+              <label className="text-cyan-500 text-sm mb-2 block">Password</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-6 w-6 text-gray-400" />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
+                    errors.password ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-6 w-6 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <Eye className="h-6 w-6 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
               </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Password"
-                className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
-                  errors.password ? "border-red-500" : "border-gray-300"
-                }`}
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-4 flex items-center"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-6 w-6 text-gray-400 hover:text-gray-600" />
-                ) : (
-                  <Eye className="h-6 w-6 text-gray-400 hover:text-gray-600" />
-                )}
-              </button>
               {errors.password && (
                 <p className="text-red-500 text-sm mt-2">{errors.password}</p>
               )}
             </div>
 
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Lock className="h-6 w-6 text-gray-400" />
+              <label className="text-cyan-500 text-sm mb-2 block">Confirm Password</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-6 w-6 text-gray-400" />
+                </div>
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Confirm Password"
+                  className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
+                    errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={
+                    showConfirmPassword
+                      ? "Hide confirm password"
+                      : "Show confirm password"
+                  }
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-6 w-6 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <Eye className="h-6 w-6 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
               </div>
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirm Password"
-                className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
-                  errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                }`}
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-4 flex items-center"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                aria-label={
-                  showConfirmPassword
-                    ? "Hide confirm password"
-                    : "Show confirm password"
-                }
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-6 w-6 text-gray-400 hover:text-gray-600" />
-                ) : (
-                  <Eye className="h-6 w-6 text-gray-400 hover:text-gray-600" />
-                )}
-              </button>
               {errors.confirmPassword && (
                 <p className="text-red-500 text-sm mt-2">
                   {errors.confirmPassword}
@@ -421,38 +419,44 @@ const SignupForm = () => {
           {/* Row 3: Name & Phone Number */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <User className="h-6 w-6 text-gray-400" />
+              <label className="text-cyan-500 text-sm mb-2 block">Full Name</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <User className="h-6 w-6 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Full Name"
+                  className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
+                    errors.name ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
               </div>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Full Name"
-                className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
-                  errors.name ? "border-red-500" : "border-gray-300"
-                }`}
-              />
               {errors.name && (
                 <p className="text-red-500 text-sm mt-2">{errors.name}</p>
               )}
             </div>
 
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Phone className="h-6 w-6 text-gray-400" />
+              <label className="text-cyan-500 text-sm mb-2 block">Phone Number</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Phone className="h-6 w-6 text-gray-400" />
+                </div>
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  placeholder="Phone Number"
+                  className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
+                    errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
               </div>
-              <input
-                type="tel"
-                name="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                placeholder="Phone Number"
-                className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all text-lg ${
-                  errors.phoneNumber ? "border-red-500" : "border-gray-300"
-                }`}
-              />
               {errors.phoneNumber && (
                 <p className="text-red-500 text-sm mt-2">
                   {errors.phoneNumber}
@@ -463,19 +467,22 @@ const SignupForm = () => {
 
           {/* Row 4: Address alone */}
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <MapPin className="h-6 w-6 text-gray-400" />
+            <label className="text-cyan-500 text-sm mb-2 block">Address</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <MapPin className="h-6 w-6 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Address"
+                className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
+                  errors.address ? "border-red-500" : "border-gray-300"
+                }`}
+              />
             </div>
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              placeholder="Address"
-              className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg ${
-                errors.address ? "border-red-500" : "border-gray-300"
-              }`}
-            />
             {errors.address && (
               <p className="text-red-500 text-sm mt-2">{errors.address}</p>
             )}
@@ -483,19 +490,22 @@ const SignupForm = () => {
 
           {/* Row 5: Bio textarea alone */}
           <div className="relative">
-            <div className="absolute top-0 left-0 pl-4 flex items-start pointer-events-none pt-4">
-              <Info className="h-6 w-6 text-gray-400" />
+            <label className="text-cyan-500 text-sm mb-2 block">Bio</label>
+            <div className="relative">
+              <div className="absolute top-0 left-0 pl-4 flex items-start pointer-events-none pt-4">
+                <Info className="h-6 w-6 text-gray-400" />
+              </div>
+              <textarea
+                name="bio"
+                value={formData.bio}
+                onChange={handleChange}
+                placeholder="Bio"
+                rows={4}
+                className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all resize-none text-lg ${
+                  errors.bio ? "border-red-500" : "border-gray-300"
+                }`}
+              />
             </div>
-            <textarea
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              placeholder="Bio"
-              rows={4}
-              className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all resize-none text-lg ${
-                errors.bio ? "border-red-500" : "border-gray-300"
-              }`}
-            />
             {errors.bio && (
               <p className="text-red-500 text-sm mt-2">{errors.bio}</p>
             )}

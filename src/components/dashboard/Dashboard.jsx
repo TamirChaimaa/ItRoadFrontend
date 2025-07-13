@@ -101,7 +101,7 @@ const Dashboard = () => {
     },
     {
       title: "Documents This Month",
-      value: 6,
+      value: 0,
       change: `+${stats.monthlyGrowth}%`,
       Icon: Calendar,
       color: "blue",
