@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-const API_BASE_URL = 'http://itroadusersservice-production.up.railway.app/api/users';
+const API_BASE_URL = 'https://itroadusersservice-production.up.railway.app/api/users';
 
 // Async thunk to fetch current user profile
 export const fetchCurrentUserProfile = createAsyncThunk(
