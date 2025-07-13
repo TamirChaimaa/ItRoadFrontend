@@ -21,7 +21,8 @@ const Profile = () => {
     updateLoading, 
     fetchError, 
     updateError, 
-    updateSuccess 
+    updateSuccess,
+    validationErrors 
   } = useSelector((state) => state.user)
 
   // Local state for form handling
@@ -33,6 +34,9 @@ const Profile = () => {
     bio: '',
     phoneNumber: '',
   })
+
+  // Local state for field-specific errors
+  const [fieldErrors, setFieldErrors] = useState({})
 
   // Fetch user profile data on component mount
   useEffect(() => {
@@ -52,10 +56,20 @@ const Profile = () => {
     }
   }, [currentUser])
 
+  // Handle validation errors
+  useEffect(() => {
+    if (validationErrors) {
+      setFieldErrors(validationErrors)
+    } else {
+      setFieldErrors({})
+    }
+  }, [validationErrors])
+
   // Handle update success
   useEffect(() => {
     if (updateSuccess) {
       setIsEditing(false)
+      setFieldErrors({})
       // Clear success state after 3 seconds
       setTimeout(() => {
         dispatch(clearUpdateSuccess())
@@ -67,6 +81,11 @@ const Profile = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setTempData((prev) => ({ ...prev, [name]: value }))
+    
+    // Clear field-specific error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: null }))
+    }
   }
 
   // Handle form submission
@@ -96,7 +115,19 @@ const Profile = () => {
       })
     }
     setIsEditing(false)
+    setFieldErrors({})
     dispatch(clearError('updateError'))
+    dispatch(clearError('validationErrors'))
+  }
+
+  // Helper function to get field error message
+  const getFieldError = (fieldName) => {
+    return fieldErrors[fieldName] || null
+  }
+
+  // Helper function to check if field has error
+  const hasFieldError = (fieldName) => {
+    return Boolean(fieldErrors[fieldName])
   }
 
   // Loading state
@@ -157,6 +188,27 @@ const Profile = () => {
             <div className="flex items-center space-x-3 text-red-700">
               <AlertCircle className="w-5 h-5" />
               <span className="font-semibold">Error updating profile: {updateError}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Validation Errors Summary */}
+        {Object.keys(fieldErrors).length > 0 && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-2xl p-4">
+            <div className="flex items-start space-x-3 text-red-700">
+              <AlertCircle className="w-5 h-5 mt-0.5" />
+              <div>
+                <span className="font-semibold block mb-2">Please fix the following errors:</span>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  {Object.entries(fieldErrors).map(([field, error]) => (
+                    error && (
+                      <li key={field}>
+                        <span className="font-medium capitalize">{field}:</span> {error}
+                      </li>
+                    )
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         )}
@@ -233,14 +285,26 @@ const Profile = () => {
                   <div className="space-y-2">
                     <label className="block text-sm font-semibold text-gray-700">Full Name</label>
                     {isEditing ? (
-                      <input
-                        type="text"
-                        name="name"
-                        value={tempData.name}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all duration-200"
-                        placeholder="Enter your full name"
-                      />
+                      <div>
+                        <input
+                          type="text"
+                          name="name"
+                          value={tempData.name}
+                          onChange={handleInputChange}
+                          className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 transition-all duration-200 ${
+                            hasFieldError('name') 
+                              ? 'border-red-500 focus:border-red-500' 
+                              : 'border-gray-200 focus:border-cyan-500'
+                          }`}
+                          placeholder="Enter your full name"
+                        />
+                        {getFieldError('name') && (
+                          <p className="mt-1 text-sm text-red-600 flex items-center space-x-1">
+                            <AlertCircle className="w-4 h-4" />
+                            <span>{getFieldError('name')}</span>
+                          </p>
+                        )}
+                      </div>
                     ) : (
                       <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-2xl">
                         <User className="w-5 h-5 text-gray-400" />
@@ -253,14 +317,26 @@ const Profile = () => {
                   <div className="space-y-2">
                     <label className="block text-sm font-semibold text-gray-700">Email</label>
                     {isEditing ? (
-                      <input
-                        type="email"
-                        name="email"
-                        value={tempData.email}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all duration-200"
-                        placeholder="Enter your email"
-                      />
+                      <div>
+                        <input
+                          type="email"
+                          name="email"
+                          value={tempData.email}
+                          onChange={handleInputChange}
+                          className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 transition-all duration-200 ${
+                            hasFieldError('email') 
+                              ? 'border-red-500 focus:border-red-500' 
+                              : 'border-gray-200 focus:border-cyan-500'
+                          }`}
+                          placeholder="Enter your email"
+                        />
+                        {getFieldError('email') && (
+                          <p className="mt-1 text-sm text-red-600 flex items-center space-x-1">
+                            <AlertCircle className="w-4 h-4" />
+                            <span>{getFieldError('email')}</span>
+                          </p>
+                        )}
+                      </div>
                     ) : (
                       <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-2xl">
                         <Mail className="w-5 h-5 text-gray-400" />
@@ -273,14 +349,26 @@ const Profile = () => {
                   <div className="space-y-2">
                     <label className="block text-sm font-semibold text-gray-700">Phone</label>
                     {isEditing ? (
-                      <input
-                        type="tel"
-                        name="phoneNumber"
-                        value={tempData.phoneNumber}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all duration-200"
-                        placeholder="Enter your phone number"
-                      />
+                      <div>
+                        <input
+                          type="tel"
+                          name="phoneNumber"
+                          value={tempData.phoneNumber}
+                          onChange={handleInputChange}
+                          className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 transition-all duration-200 ${
+                            hasFieldError('phoneNumber') 
+                              ? 'border-red-500 focus:border-red-500' 
+                              : 'border-gray-200 focus:border-cyan-500'
+                          }`}
+                          placeholder="Enter your phone number"
+                        />
+                        {getFieldError('phoneNumber') && (
+                          <p className="mt-1 text-sm text-red-600 flex items-center space-x-1">
+                            <AlertCircle className="w-4 h-4" />
+                            <span>{getFieldError('phoneNumber')}</span>
+                          </p>
+                        )}
+                      </div>
                     ) : (
                       <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-2xl">
                         <Phone className="w-5 h-5 text-gray-400" />
@@ -311,14 +399,26 @@ const Profile = () => {
                   <div className="space-y-2 md:col-span-2 lg:col-span-1">
                     <label className="block text-sm font-semibold text-gray-700">Address</label>
                     {isEditing ? (
-                      <input
-                        type="text"
-                        name="address"
-                        value={tempData.address}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all duration-200"
-                        placeholder="Enter your address"
-                      />
+                      <div>
+                        <input
+                          type="text"
+                          name="address"
+                          value={tempData.address}
+                          onChange={handleInputChange}
+                          className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 transition-all duration-200 ${
+                            hasFieldError('address') 
+                              ? 'border-red-500 focus:border-red-500' 
+                              : 'border-gray-200 focus:border-cyan-500'
+                          }`}
+                          placeholder="Enter your address"
+                        />
+                        {getFieldError('address') && (
+                          <p className="mt-1 text-sm text-red-600 flex items-center space-x-1">
+                            <AlertCircle className="w-4 h-4" />
+                            <span>{getFieldError('address')}</span>
+                          </p>
+                        )}
+                      </div>
                     ) : (
                       <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-2xl">
                         <MapPin className="w-5 h-5 text-gray-400" />
@@ -333,14 +433,26 @@ const Profile = () => {
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">Bio</label>
                 {isEditing ? (
-                  <textarea
-                    name="bio"
-                    value={tempData.bio}
-                    onChange={handleInputChange}
-                    rows={4}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all duration-200 resize-none"
-                    placeholder="Tell us about yourself..."
-                  />
+                  <div>
+                    <textarea
+                      name="bio"
+                      value={tempData.bio}
+                      onChange={handleInputChange}
+                      rows={4}
+                      className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 transition-all duration-200 resize-none ${
+                        hasFieldError('bio') 
+                          ? 'border-red-500 focus:border-red-500' 
+                          : 'border-gray-200 focus:border-cyan-500'
+                      }`}
+                      placeholder="Tell us about yourself..."
+                    />
+                    {getFieldError('bio') && (
+                      <p className="mt-1 text-sm text-red-600 flex items-center space-x-1">
+                        <AlertCircle className="w-4 h-4" />
+                        <span>{getFieldError('bio')}</span>
+                      </p>
+                    )}
+                  </div>
                 ) : (
                   <div className="p-4 bg-gray-50 rounded-2xl">
                     <p className="text-gray-900">{currentUser?.bio || 'No bio provided'}</p>
