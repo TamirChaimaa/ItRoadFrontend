@@ -144,7 +144,7 @@ const AddDocument = () => {
           <div className="p-8 md:p-12">
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Form Fields - Full Width Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">Document Title</label>
                   <input
