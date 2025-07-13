@@ -8,6 +8,7 @@ import AdminDashboard from './components/AdminDashboard';
 
 function App() {
   return (
+    
     <Provider store={store}>
       <Router>
         <Routes>
