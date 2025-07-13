@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useState } from "react"
 import { Upload, X, FileText, ImageIcon, Video, Archive, Plus, Info, XCircle } from "lucide-react"

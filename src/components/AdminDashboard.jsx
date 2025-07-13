@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import { Routes, Route } from "react-router-dom";
 import Header from "./layout/Header";
 import Sidebar from "./layout/Sidebar";
@@ -25,10 +26,10 @@ const AdminDashboardLayout = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar isOpen={isSidebarOpen} />
-      
+
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header toggleSidebar={toggleSidebar} />
-        
+
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
           <Routes>
             <Route path="" element={<Dashboard />} />
@@ -37,7 +38,7 @@ const AdminDashboardLayout = () => {
             <Route path="profile" element={<Profile />} />
           </Routes>
         </main>
-        
+
         <Footer />
       </div>
     </div>
