@@ -46,6 +46,10 @@ const AdminDashboardLayout = () => {
   );
 };
 
-const AdminDashboard = () => <AdminDashboardLayout />;
+const AdminDashboard = () => (
+  <Routes>
+    <Route path="dashboard/*" element={<AdminDashboardLayout />} />
+  </Routes>
+);
 
 export default AdminDashboard;
