@@ -329,16 +329,7 @@ const UsersTabs = () => {
               <option value="Editor">Editor</option>
               <option value="User">User</option>
             </motion.select>
-            <motion.select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all duration-200"
-              whileFocus={{ scale: 1.02, y: -2 }}
-            >
-              <option value="all">All statuses</option>
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </motion.select>
+        
           </div>
         </motion.div>
 

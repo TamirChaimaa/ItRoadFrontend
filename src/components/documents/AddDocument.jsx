@@ -28,7 +28,6 @@ const AddDocument = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
-  // État pour l'alerte personnalisée
   const [alertConfig, setAlertConfig] = useState({
     open: false,
     title: "",
@@ -113,7 +112,7 @@ const AddDocument = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.file) {
-      showAlert("Fichier manquant", "Veuillez sélectionner un fichier avant de soumettre.", "error");
+      showAlert("Missing File", "Please select a file before submitting.", "error");
       return;
     }
 
@@ -127,16 +126,16 @@ const AddDocument = () => {
       if (createDocument.fulfilled.match(result)) {
         const uploadedDoc = result.payload;
         showAlert(
-          "Succès",
-          `Document "${uploadedDoc.name || "N/A"}" uploadé avec succès.`,
+          "Success",
+          `Document "${uploadedDoc.name || "N/A"}" uploaded successfully.`,
           "success"
         );
         handleCancel();
       } else {
-        showAlert("Échec", "Échec de l’envoi du document.", "error");
+        showAlert("Failed", "Document upload failed.", "error");
       }
     } catch (error) {
-      showAlert("Erreur", error.message, "error");
+      showAlert("Error", error.message, "error");
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -154,19 +153,18 @@ const AddDocument = () => {
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-            Ajouter un document
+            Add a Document
           </h1>
-          <p className="text-gray-600">Téléversez et organisez vos fichiers facilement</p>
+          <p className="text-gray-600">Upload and organize your files easily</p>
         </div>
 
-        {/* Formulaire principal */}
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
           <div className="p-8 md:p-12">
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">
-                    Titre du document
+                    Document Title
                   </label>
                   <input
                     type="text"
@@ -174,14 +172,14 @@ const AddDocument = () => {
                     value={formData.title}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500"
-                    placeholder="Entrez le titre..."
+                    placeholder="Enter the title..."
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">
-                    Catégorie
+                    Category
                   </label>
                   <select
                     name="category"
@@ -190,11 +188,11 @@ const AddDocument = () => {
                     className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500"
                     required
                   >
-                    <option value="">Choisir une catégorie</option>
-                    <option value="report">Rapport</option>
-                    <option value="presentation">Présentation</option>
-                    <option value="contract">Contrat</option>
-                    <option value="other">Autre</option>
+                    <option value="">Select a category</option>
+                    <option value="report">Report</option>
+                    <option value="presentation">Presentation</option>
+                    <option value="contract">Contract</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
               </div>
@@ -209,13 +207,13 @@ const AddDocument = () => {
                   onChange={handleInputChange}
                   rows={4}
                   className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl resize-none focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500"
-                  placeholder="Décrivez votre document..."
+                  placeholder="Describe your document..."
                 />
               </div>
 
               <div className="space-y-4">
                 <label className="block text-sm font-semibold text-gray-700">
-                  Fichier
+                  File
                 </label>
 
                 <div
@@ -241,10 +239,10 @@ const AddDocument = () => {
                     </div>
                     <div>
                       <p className="text-lg font-semibold text-gray-700 mb-2">
-                        Glissez votre fichier ici ou cliquez pour choisir
+                        Drag your file here or click to select
                       </p>
                       <p className="text-sm text-gray-500">
-                        Formats supportés : PDF, DOC, PPT, Images (10MB max)
+                        Supported formats: PDF, DOC, PPT, Images (10MB max)
                       </p>
                     </div>
                   </div>
@@ -277,7 +275,7 @@ const AddDocument = () => {
               {isUploading && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Téléversement en cours...</span>
+                    <span className="text-gray-600">Uploading...</span>
                     <span className="text-cyan-600 font-semibold">
                       {uploadProgress}%
                     </span>
@@ -297,7 +295,7 @@ const AddDocument = () => {
                   onClick={handleCancel}
                   className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-50 font-semibold"
                 >
-                  Annuler
+                  Cancel
                 </button>
                 <button
                   type="submit"
@@ -307,12 +305,12 @@ const AddDocument = () => {
                   {isUploading ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Envoi...</span>
+                      <span>Uploading...</span>
                     </>
                   ) : (
                     <>
                       <Plus className="w-5 h-5" />
-                      <span>Envoyer</span>
+                      <span>Submit</span>
                     </>
                   )}
                 </button>
@@ -322,11 +320,10 @@ const AddDocument = () => {
         </div>
       </div>
 
-      {/* ✅ Alerte personnalisée */}
+      {/* ✅ Custom Alert Modal */}
       {alertConfig.open && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white border-t-4 rounded-xl shadow-xl p-6 max-w-sm w-full
-            border-blue-500">
+          <div className="bg-white border-t-4 rounded-xl shadow-xl p-6 max-w-sm w-full border-blue-500">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center space-x-3">
                 {alertConfig.type === "error" ? (
@@ -350,7 +347,7 @@ const AddDocument = () => {
                 onClick={closeAlert}
                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-semibold text-gray-700"
               >
-                Fermer
+                Close
               </button>
             </div>
           </div>
@@ -361,3 +358,4 @@ const AddDocument = () => {
 };
 
 export default AddDocument;
+
