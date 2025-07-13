@@ -178,17 +178,6 @@ const AddDocument = () => {
                   </select>
                 </div>
 
-                <div className="space-y-2 md:col-span-2 lg:col-span-1">
-                  <label className="block text-sm font-semibold text-gray-700">Priority</label>
-                  <select
-                    name="priority"
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all duration-200"
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                </div>
               </div>
 
               {/* Description - Full Width */}
