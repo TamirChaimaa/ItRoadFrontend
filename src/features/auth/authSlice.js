@@ -43,8 +43,9 @@ export const validateToken = createAsyncThunk(
     try {
       const token = Cookies.get('authToken');
 
+      // ✅ If no token exists, don't treat this as an error
       if (!token) {
-        return rejectWithValue('No token found');
+        return rejectWithValue({ silent: true, message: 'No token found' });
       }
 
       const response = await axios.post(`${API_BASE_URL}/validate`, {}, {
@@ -61,14 +62,15 @@ export const validateToken = createAsyncThunk(
         valid: response.data.valid,
       };
     } catch (error) {
-      //Clear cookies if token is invalid or request fails
+      // Clear cookies if token is invalid or request fails
       Cookies.remove('authToken');
       Cookies.remove('userRole');
       Cookies.remove('username');
       Cookies.remove('userId');
 
       const message = error.response?.data?.message || 'Token validation failed';
-      return rejectWithValue(message);
+      // ✅ Mark as silent to avoid displaying the error
+      return rejectWithValue({ silent: true, message });
     }
   }
 );
@@ -77,7 +79,7 @@ export const validateToken = createAsyncThunk(
 export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
   async () => {
-    // ✅ Remove all authentication-related cookies
+    // Remove all authentication-related cookies
     Cookies.remove('authToken');
     Cookies.remove('userRole');
     Cookies.remove('username');
@@ -158,7 +160,8 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         state.token = null;
-        state.error = action.payload;
+        // Don't display the error if it's marked as silent
+        state.error = action.payload?.silent ? null : action.payload?.message || action.payload;
         state.isInitialized = true;
       })
 

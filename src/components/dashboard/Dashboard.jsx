@@ -1,34 +1,69 @@
-import { FileText, Users, Plus, TrendingUp, Download, Eye, Activity } from "lucide-react"
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { FileText, Users, Plus, TrendingUp, Download, Eye, Activity } from "lucide-react";
+import { fetchUserDocuments, countDocumentsByUser } from "../../features/document/documentSlice"; // Adjust path as needed
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
+
+  // Access state from Redux store
+  const documents = useSelector(state => state.documents.list);
+  const documentCount = useSelector(state => state.documents.count);
+  const loading = useSelector(state => state.documents.loading);
+
+  // Fetch documents and document count when the component mounts
+  useEffect(() => {
+    dispatch(fetchUserDocuments());
+    dispatch(countDocumentsByUser());
+  }, [dispatch]);
+
+  // Dashboard statistic cards using real data
   const stats = [
-    { title: "Total Documents", value: "1,234", change: "+12%", Icon: FileText, color: "cyan", trend: "up" },
-    { title: "Active Users", value: "567", change: "+8%", Icon: Users, color: "green", trend: "up" },
-    { title: "Documents This Month", value: "89", change: "+23%", Icon: Plus, color: "blue", trend: "up" },
-    { title: "Activity Rate", value: "92%", change: "-2%", Icon: TrendingUp, color: "purple", trend: "down" },
-  ]
+    {
+      title: "Total Documents",
+      value: documentCount,
+      change: "+12%",
+      Icon: FileText,
+      color: "cyan",
+      trend: "up",
+    },
+    {
+      title: "Active Users",
+      value: "N/A", // Placeholder for future data
+      change: "+8%",
+      Icon: Users,
+      color: "green",
+      trend: "up",
+    },
+    {
+      title: "Documents This Month",
+      value: documents.length,
+      change: "+23%",
+      Icon: Plus,
+      color: "blue",
+      trend: "up",
+    },
+    {
+      title: "Activity Rate",
+      value: "N/A", // Placeholder
+      change: "-2%",
+      Icon: TrendingUp,
+      color: "purple",
+      trend: "down",
+    },
+  ];
 
-  const recentDocuments = [
-    { name: "Q1 Report 2024.pdf", user: "Ahmed B.", time: "2h", type: "PDF" },
-    { name: "Client Presentation.pptx", user: "Fatima Z.", time: "4h", type: "PPT" },
-    { name: "Budget 2024.xlsx", user: "Mohamed A.", time: "6h", type: "XLS" },
-    { name: "Service Contract.docx", user: "Aicha K.", time: "1d", type: "DOC" },
-  ]
+  // Show only 4 most recent documents
+  const recentDocuments = documents.slice(0, 4);
 
-  const activities = [
-    { action: "Document downloaded", user: "Ahmed Bennani", time: "5 min", type: "upload" },
-    { action: "New user registered", user: "Sara Alami", time: "15 min", type: "user" },
-    { action: "Document updated", user: "Mohamed Tazi", time: "30 min", type: "edit" },
-    { action: "System login", user: "Admin", time: "1h", type: "login" },
-  ]
-
+  // Individual card for dashboard statistics
   const StatCard = ({ title, value, change, Icon, color, trend }) => {
     const colorClasses = {
       cyan: "from-cyan-400 to-cyan-600",
       green: "from-green-400 to-green-600",
       blue: "from-blue-400 to-blue-600",
       purple: "from-purple-400 to-purple-600",
-    }
+    };
 
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-all duration-300">
@@ -52,19 +87,22 @@ const Dashboard = () => {
           <p className="text-sm text-gray-600">{title}</p>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Headers */}
+        {/* Dashboard Title */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
-          <p className="text-gray-600">Overview of your management system</p>
+          <p className="text-gray-600">Overview of your document management system</p>
         </div>
 
-        {/* Stats Grids */}
+        {/* Display loading or error */}
+        {loading && <p className="text-sm text-blue-500">Loading...</p>}
+  
+        {/* Statistic Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
             <StatCard key={index} {...stat} />
@@ -73,11 +111,10 @@ const Dashboard = () => {
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Documents */}
+          {/* Recent Documents List */}
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Recent Documents</h3>
-              <button className="text-cyan-600 hover:text-cyan-700 font-medium text-sm">View All</button>
             </div>
             <div className="space-y-4">
               {recentDocuments.map((doc, index) => (
@@ -92,7 +129,7 @@ const Dashboard = () => {
                     <div>
                       <p className="font-medium text-gray-900">{doc.name}</p>
                       <p className="text-sm text-gray-500">
-                        By {doc.user} • {doc.time}
+                        By User {doc.userId} • {doc.date}
                       </p>
                     </div>
                   </div>
@@ -112,35 +149,18 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Activity Feed */}
+          {/* Activity Feed Placeholder */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
               <Activity className="w-5 h-5 text-gray-400" />
             </div>
-            <div className="space-y-4">
-              {activities.map((activity, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-900">
-                      <span className="font-medium">{activity.action}</span>
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {activity.user} • {activity.time}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <p className="text-sm text-gray-500">Coming soon: Activity feed based on document history.</p>
           </div>
         </div>
-
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

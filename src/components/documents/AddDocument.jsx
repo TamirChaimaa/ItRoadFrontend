@@ -1,157 +1,228 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Upload, X, FileText, ImageIcon, Video, Archive, Plus } from "lucide-react"
+import { useState } from "react";
+import {
+  Upload,
+  X,
+  FileText,
+  ImageIcon,
+  Video,
+  Archive,
+  Plus,
+  Info,
+  XCircle,
+} from "lucide-react";
+import { createDocument } from "../../features/document/documentSlice";
+import { useDispatch } from "react-redux";
 
 const AddDocument = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
-    files: [],
-  })
-  const [dragActive, setDragActive] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [isUploading, setIsUploading] = useState(false)
+    file: null,
+  });
+
+  const dispatch = useDispatch();
+  const [dragActive, setDragActive] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // État pour l'alerte personnalisée
+  const [alertConfig, setAlertConfig] = useState({
+    open: false,
+    title: "",
+    message: "",
+    type: "info", // "info", "error", "success"
+  });
+
+  const showAlert = (title, message, type = "info") => {
+    setAlertConfig({ open: true, title, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertConfig((prev) => ({ ...prev, open: false }));
+  };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files)
-    setFormData((prev) => ({ ...prev, files }))
-  }
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, file }));
+    }
+  };
 
   const handleDrag = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
     if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true)
+      setDragActive(true);
     } else if (e.type === "dragleave") {
-      setDragActive(false)
+      setDragActive(false);
     }
-  }
+  };
 
   const handleDrop = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const files = Array.from(e.dataTransfer.files)
-      setFormData((prev) => ({ ...prev, files }))
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      setFormData((prev) => ({ ...prev, file: e.dataTransfer.files[0] }));
     }
-  }
+  };
 
-  const removeFile = (indexToRemove) => {
-    setFormData((prev) => ({
-      ...prev,
-      files: prev.files.filter((_, index) => index !== indexToRemove),
-    }))
-  }
+  const removeFile = () => {
+    setFormData((prev) => ({ ...prev, file: null }));
+  };
 
   const getFileIcon = (fileName) => {
-    const extension = fileName.split(".").pop().toLowerCase()
+    const extension = fileName.split(".").pop().toLowerCase();
     switch (extension) {
       case "pdf":
-        return <FileText className="w-5 h-5 text-red-500" />
+        return <FileText className="w-5 h-5 text-red-500" />;
       case "jpg":
       case "jpeg":
       case "png":
       case "gif":
-        return <ImageIcon className="w-5 h-5 text-green-500" />
+        return <ImageIcon className="w-5 h-5 text-green-500" />;
       case "mp4":
       case "avi":
       case "mov":
-        return <Video className="w-5 h-5 text-purple-500" />
+        return <Video className="w-5 h-5 text-purple-500" />;
       case "zip":
       case "rar":
-        return <Archive className="w-5 h-5 text-yellow-500" />
+        return <Archive className="w-5 h-5 text-yellow-500" />;
       default:
-        return <FileText className="w-5 h-5 text-gray-500" />
+        return <FileText className="w-5 h-5 text-gray-500" />;
     }
-  }
+  };
+
+  const buildFormData = (data) => {
+    const form = new FormData();
+    form.append("title", data.title);
+    form.append("description", data.description);
+    form.append("category", data.category);
+    if (data.file) form.append("file", data.file);
+    return form;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsUploading(true)
-
-    for (let i = 0; i <= 100; i += 10) {
-      setUploadProgress(i)
-      await new Promise((resolve) => setTimeout(resolve, 100))
+    e.preventDefault();
+    if (!formData.file) {
+      showAlert("Fichier manquant", "Veuillez sélectionner un fichier avant de soumettre.", "error");
+      return;
     }
 
-    console.log("Form submitted:", formData)
-    setIsUploading(false)
-    setUploadProgress(0)
-  }
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      const payload = buildFormData(formData);
+      const result = await dispatch(createDocument(payload));
+
+      if (createDocument.fulfilled.match(result)) {
+        const uploadedDoc = result.payload;
+        showAlert(
+          "Succès",
+          `Document "${uploadedDoc.name || "N/A"}" uploadé avec succès.`,
+          "success"
+        );
+        handleCancel();
+      } else {
+        showAlert("Échec", "Échec de l’envoi du document.", "error");
+      }
+    } catch (error) {
+      showAlert("Erreur", error.message, "error");
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleCancel = () => {
+    setFormData({ title: "", description: "", category: "", file: null });
+    setUploadProgress(0);
+    setIsUploading(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Add Documents</h1>
-          <p className="text-gray-600">Upload and organize your files easily</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            Ajouter un document
+          </h1>
+          <p className="text-gray-600">Téléversez et organisez vos fichiers facilement</p>
         </div>
 
+        {/* Formulaire principal */}
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
           <div className="p-8 md:p-12">
             <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Title & Description */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">Document Title</label>
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Titre du document
+                  </label>
                   <input
                     type="text"
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all duration-200"
-                    placeholder="Enter the title..."
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500"
+                    placeholder="Entrez le titre..."
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">Category</label>
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Catégorie
+                  </label>
                   <select
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all duration-200"
+                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500"
                     required
                   >
-                    <option value="">Select a category</option>
-                    <option value="report">📊 Report</option>
-                    <option value="presentation">📽️ Presentation</option>
-                    <option value="contract">📋 Contract</option>
-                    <option value="other">📁 Other</option>
+                    <option value="">Choisir une catégorie</option>
+                    <option value="report">Rapport</option>
+                    <option value="presentation">Présentation</option>
+                    <option value="contract">Contrat</option>
+                    <option value="other">Autre</option>
                   </select>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">Description</label>
+                <label className="block text-sm font-semibold text-gray-700">
+                  Description
+                </label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all duration-200 resize-none"
-                  placeholder="Describe your document..."
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl resize-none focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500"
+                  placeholder="Décrivez votre document..."
                 />
               </div>
 
-              {/* File Upload Zone */}
               <div className="space-y-4">
-                <label className="block text-sm font-semibold text-gray-700">Files</label>
+                <label className="block text-sm font-semibold text-gray-700">
+                  Fichier
+                </label>
 
                 <div
-                  className={`relative border-2 border-dashed rounded-3xl p-8 md:p-12 text-center transition-all duration-300 ${
-                    dragActive ? "border-cyan-500 bg-cyan-50" : "border-gray-300 hover:border-cyan-400 hover:bg-gray-50"
+                  className={`relative border-2 border-dashed rounded-3xl p-8 text-center transition-all duration-300 ${
+                    dragActive
+                      ? "border-cyan-500 bg-cyan-50"
+                      : "border-gray-300 hover:border-cyan-400 hover:bg-gray-50"
                   }`}
                   onDragEnter={handleDrag}
                   onDragLeave={handleDrag}
@@ -160,94 +231,88 @@ const AddDocument = () => {
                 >
                   <input
                     type="file"
-                    multiple
                     onChange={handleFileChange}
                     accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
-
                   <div className="space-y-4">
                     <div className="w-16 h-16 mx-auto bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-2xl flex items-center justify-center">
                       <Upload className="w-8 h-8 text-white" />
                     </div>
                     <div>
                       <p className="text-lg font-semibold text-gray-700 mb-2">
-                        Drag your files here or click to browse
+                        Glissez votre fichier ici ou cliquez pour choisir
                       </p>
-                      <p className="text-sm text-gray-500">PDF, DOC, XLS, PPT, Images (Max 10MB per file)</p>
+                      <p className="text-sm text-gray-500">
+                        Formats supportés : PDF, DOC, PPT, Images (10MB max)
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                {/* File List */}
-                {formData.files.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-gray-700">Selected Files:</h4>
-                    <div className="grid gap-3">
-                      {formData.files.map((file, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200"
-                        >
-                          <div className="flex items-center space-x-3">
-                            {getFileIcon(file.name)}
-                            <div>
-                              <p className="font-medium text-gray-900 truncate max-w-xs">{file.name}</p>
-                              <p className="text-sm text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => removeFile(index)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
+                {formData.file && (
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200 mt-3">
+                    <div className="flex items-center space-x-3">
+                      {getFileIcon(formData.file.name)}
+                      <div>
+                        <p className="font-medium text-gray-900 truncate max-w-xs">
+                          {formData.file.name}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {(formData.file.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
+                      </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={removeFile}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
                 )}
               </div>
 
-              {/* Progress Bar */}
               {isUploading && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Uploading...</span>
-                    <span className="text-cyan-600 font-semibold">{uploadProgress}%</span>
+                    <span className="text-gray-600">Téléversement en cours...</span>
+                    <span className="text-cyan-600 font-semibold">
+                      {uploadProgress}%
+                    </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 h-2 rounded-full"
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>
                 </div>
               )}
 
-              {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-6">
                 <button
                   type="button"
-                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-50 transition-all duration-200 font-semibold"
+                  onClick={handleCancel}
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-50 font-semibold"
                 >
-                  Cancel
+                  Annuler
                 </button>
                 <button
                   type="submit"
-                  disabled={isUploading}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-500 to-cyan-600 text-white rounded-2xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-200 font-semibold shadow-lg shadow-cyan-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                  disabled={isUploading || !formData.file}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-500 to-cyan-600 text-white rounded-2xl hover:from-cyan-600 hover:to-cyan-700 font-semibold shadow-lg disabled:opacity-50 flex items-center justify-center space-x-2"
                 >
                   {isUploading ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Uploading...</span>
+                      <span>Envoi...</span>
                     </>
                   ) : (
                     <>
                       <Plus className="w-5 h-5" />
-                      <span>Upload Documents</span>
+                      <span>Envoyer</span>
                     </>
                   )}
                 </button>
@@ -256,8 +321,43 @@ const AddDocument = () => {
           </div>
         </div>
       </div>
-    </div>
-  )
-}
 
-export default AddDocument
+      {/* ✅ Alerte personnalisée */}
+      {alertConfig.open && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white border-t-4 rounded-xl shadow-xl p-6 max-w-sm w-full
+            border-blue-500">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center space-x-3">
+                {alertConfig.type === "error" ? (
+                  <XCircle className="w-7 h-7 text-red-500" />
+                ) : (
+                  <Info className="w-7 h-7 text-blue-500" />
+                )}
+                <h3 className={`text-lg font-bold ${
+                  alertConfig.type === "error" ? "text-red-600" : "text-blue-700"
+                }`}>
+                  {alertConfig.title}
+                </h3>
+              </div>
+              <button onClick={closeAlert}>
+                <XCircle className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+              </button>
+            </div>
+            <p className="text-gray-700 mb-6">{alertConfig.message}</p>
+            <div className="flex justify-end">
+              <button
+                onClick={closeAlert}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-semibold text-gray-700"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AddDocument;

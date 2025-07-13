@@ -5,55 +5,59 @@ import { useNavigate } from "react-router-dom";
 import { loginUser, clearError } from "../features/auth/authSlice";
 
 const SigninForm = () => {
+  // Form state to track username and password input
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // États Redux
+  // Get authentication state from Redux
   const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
+  const [errors, setErrors] = useState({});                // Form validation errors
+  const [rememberMe, setRememberMe] = useState(false);     // "Remember Me" checkbox
 
-  // Rediriger si déjà connecté
+  // Redirect to dashboard if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
 
-  // Nettoyer les erreurs Redux quand le composant se démonte
+  // Clear Redux error when component unmounts
   useEffect(() => {
     return () => {
       dispatch(clearError());
     };
   }, [dispatch]);
 
+  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    
-    // Clear error when user starts typing
+
+    // Clear field-specific error on typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
         [name]: "",
       }));
     }
-    
-    // Clear Redux error
+
+    // Clear global Redux error
     if (error) {
       dispatch(clearError());
     }
   };
 
+  // Validate form before submission
   const validateForm = () => {
     const newErrors = {};
 
@@ -69,32 +73,33 @@ const SigninForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!validateForm()) return;
+    if (!validateForm()) return;
 
-  try {
-    const resultAction = await dispatch(loginUser({
-      username: formData.username,
-      password: formData.password,
-      // plus besoin de rememberMe ici
-    }));
+    try {
+      const resultAction = await dispatch(loginUser({
+        username: formData.username,
+        password: formData.password,
+      }));
 
-    if (loginUser.fulfilled.match(resultAction)) {
-      console.log('Login successful');
-      // redirection se fait via useEffect
+      if (loginUser.fulfilled.match(resultAction)) {
+        console.log('Login successful');
+        // Redirection is handled in the useEffect
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
     }
-  } catch (error) {
-    console.error('Login failed:', error);
-  }
-};
+  };
 
-
+  // Redirect to signup page
   const handleSignupClick = () => {
     navigate("/signup");
   };
 
+  // IT Road logo component
   const ITRoadLogo = () => (
     <div className="flex items-center justify-center mb-8">
       <div className="relative">
@@ -114,6 +119,7 @@ const SigninForm = () => {
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md transform transition-all hover:scale-105">
         <ITRoadLogo />
 
+        {/* Welcome text */}
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">
           Welcome Back
         </h2>
@@ -122,14 +128,14 @@ const SigninForm = () => {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Afficher les erreurs Redux */}
+          {/* Global Redux error */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
               <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
 
-          {/* Username Field */}
+          {/* Username field */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <User className="h-5 w-5 text-gray-400" />
@@ -150,7 +156,7 @@ const SigninForm = () => {
             )}
           </div>
 
-          {/* Password Field */}
+          {/* Password field */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Lock className="h-5 w-5 text-gray-400" />
@@ -183,7 +189,7 @@ const SigninForm = () => {
             )}
           </div>
 
-          {/* Remember Me & Forgot Password */}
+          {/* Remember me & forgot password */}
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
@@ -210,7 +216,7 @@ const SigninForm = () => {
             </button>
           </div>
 
-          {/* Submit Button */}
+          {/* Submit button */}
           <button
             type="submit"
             disabled={loading}
@@ -243,7 +249,7 @@ const SigninForm = () => {
           </div>
         </div>
 
-        {/* Sign Up Link */}
+        {/* Link to signup */}
         <div className="text-center">
           <p className="text-gray-600">
             Don't have an account?{" "}

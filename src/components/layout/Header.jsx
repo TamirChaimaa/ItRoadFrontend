@@ -1,7 +1,11 @@
-"use client"
+// src/components/layout/Header.jsx
 import { Search, Bell, User, Menu, X } from "lucide-react"
+import { useSelector } from "react-redux" //
+
 
 const Header = ({ toggleSidebar, isSidebarOpen }) => {
+   // Get user info from Redux store
+  const user = useSelector((state) => state.auth.user)
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 px-4 py-3">
       <div className="flex items-center justify-between">
@@ -25,7 +29,7 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
             <Search size={16} className="text-gray-400 mr-2" />
             <input
               type="text"
-              placeholder="Rechercher..."
+              placeholder="Search..."
               className="bg-transparent outline-none text-sm flex-1 text-gray-700"
             />
           </div>
@@ -44,8 +48,8 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
               <User size={16} className="text-white" />
             </div>
             <div className="hidden md:block">
-              <span className="text-sm font-medium text-gray-700">Admin</span>
-              <p className="text-xs text-gray-500">Administrateur</p>
+              <span className="text-sm font-medium text-gray-700">{user?.username}</span>
+              <p className="text-xs text-gray-500">{user?.role}</p>
             </div>
           </div>
         </div>
